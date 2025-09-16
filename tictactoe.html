@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe with AI</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      cursor: pointer;
+      border: 2px solid #333;
+    }
+    #status {
+      margin-top: 15px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    #chat-link {
+      margin-top: 20px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe vs AI</h1>
+  <div id="board"></div>
+  <div id="status">Your turn!</div>
+  <div id="chat-link">
+    <a href="https://chatgpt.com/share/68c8f68a-09ac-8001-9535-2bfcfd735f0a" target="_blank">View AI Chat History</a>
+  </div>
+
+  <script>
+    const boardElement = document.getElementById('board');
+    const statusElement = document.getElementById('status');
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let gameOver = false;
+
+    function renderBoard() {
+      boardElement.innerHTML = '';
+      board.forEach((cell, index) => {
+        const cellElement = document.createElement('div');
+        cellElement.classList.add('cell');
+        cellElement.textContent = cell;
+        cellElement.addEventListener('click', () => handleMove(index));
+        boardElement.appendChild(cellElement);
+      });
+    }
+
+    function handleMove(index) {
+      if (board[index] !== '' || gameOver) return;
+      board[index] = 'X';
+      renderBoard();
+      if (checkWinner('X')) {
+        statusElement.textContent = 'You win! 🎉';
+        gameOver = true;
+        return;
+      }
+      if (board.every(cell => cell !== '')) {
+        statusElement.textContent = "It's a draw!";
+        gameOver = true;
+        return;
+      }
+      aiMove();
+    }
+
+    function aiMove() {
+      let emptyIndices = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+      if (emptyIndices.length === 0) return;
+      let choice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+      board[choice] = 'O';
+      renderBoard();
+      if (checkWinner('O')) {
+        statusElement.textContent = 'AI wins! 🤖';
+        gameOver = true;
+      } else if (board.every(cell => cell !== '')) {
+        statusElement.textContent = "It's a draw!";
+        gameOver = true;
+      }
+    }
+
+    function checkWinner(player) {
+      const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+      ];
+      return winPatterns.some(pattern =>
+        pattern.every(index => board[index] === player)
+      );
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
